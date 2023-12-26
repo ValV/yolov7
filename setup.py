@@ -1,9 +1,12 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='yolov7',
     version='0.1.0',
-    packages=find_packages('yolov7', include=['yolov7.*']),
+    packages=['yolov7'],
+    package_data={
+        'yolov7': ['yolov7/**/*'],
+    },
     url='https://github.com/ValV/yolov7',
     license='GPLv3',
     author='ValV',
