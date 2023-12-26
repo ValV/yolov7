@@ -1,12 +1,17 @@
+from pathlib import Path
 from setuptools import setup
+
+package = 'yolov7'
+packages = [package] + [str(path) for path in Path(package).rglob('*/')
+                        if path.is_dir() and '__' not in str(path)]
 
 setup(
     name='yolov7',
     version='0.1.0',
-    packages=['yolov7'],
     package_data={
-        'yolov7': ['yolov7/**/*'],
+        '': ['*.yaml'],
     },
+    packages=packages,
     url='https://github.com/ValV/yolov7',
     license='GPLv3',
     author='ValV',
