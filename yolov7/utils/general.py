@@ -20,7 +20,6 @@ import yaml
 
 from .. import PACKAGE_ROOT
 from .google_utils import gsutil_getsize
-from .metrics import fitness
 from .torch_utils import init_torch_seeds
 
 # Settings
@@ -815,6 +814,8 @@ def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_op
 
 
 def print_mutation(hyp, results, yaml_file='hyp_evolved.yaml', bucket=''):
+    from .metrics import fitness
+
     # Print mutation results to evolve.txt (for use with train.py --evolve)
     a = '%10s' * len(hyp) % tuple(hyp.keys())  # hyperparam keys
     b = '%10.3g' * len(hyp) % tuple(hyp.values())  # hyperparam values
