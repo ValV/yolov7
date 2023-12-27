@@ -4,7 +4,11 @@ import torch
 import torch.nn as nn
 
 from .common import Conv, DWConv
-from ..utils.google_utils import attempt_download
+# TODO: remove exception handling after relative import issue fixed
+try:
+    from ..utils.google_utils import attempt_download
+except ImportError:
+    from yolov7.utils.google_utils import attempt_download
 
 
 class CrossConv(nn.Module):
