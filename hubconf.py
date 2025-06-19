@@ -15,7 +15,9 @@ from yolov7.utils.google_utils import attempt_download
 from yolov7.utils.torch_utils import select_device
 
 dependencies = ['torch', 'yaml']
-check_requirements(Path(__file__).parent / 'requirements.txt', exclude=('pycocotools', 'thop'))
+check_requirements(
+    Path(__file__).parent / 'requirements.txt', exclude=('pycocotools', 'thop')
+)
 set_logging()
 
 
@@ -32,21 +34,33 @@ def create(name, pretrained, channels, classes, autoshape):
         pytorch model
     """
     try:
-        cfg = list((Path(__file__).parent / 'cfg').rglob(f'{name}.yaml'))[0]  # model.yaml path
+        cfg = list((Path(__file__).parent / 'cfg').rglob(f'{name}.yaml'))[
+            0
+        ]  # model.yaml path
         model = Model(cfg, channels, classes)
         if pretrained:
             fname = f'{name}.pt'  # checkpoint filename
             attempt_download(fname)  # download if not found locally
-            ckpt = torch.load(fname, map_location=torch.device('cpu'))  # load
+            ckpt = torch.load(
+                fname, map_location=torch.device('cpu'), weights_only=False
+            )  # load
             msd = model.state_dict()  # model state_dict
-            csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
-            csd = {k: v for k, v in csd.items() if msd[k].shape == v.shape}  # filter
+            csd = (
+                ckpt['model'].float().state_dict()
+            )  # checkpoint state_dict as FP32
+            csd = {
+                k: v for k, v in csd.items() if msd[k].shape == v.shape
+            }  # filter
             model.load_state_dict(csd, strict=False)  # load
             if len(ckpt['model'].names) == classes:
                 model.names = ckpt['model'].names  # set class names attribute
             if autoshape:
-                model = model.autoshape()  # for file/URI/PIL/cv2/np inputs and NMS
-        device = select_device('0' if torch.cuda.is_available() else 'cpu')  # default to GPU if available
+                model = (
+                    model.autoshape()
+                )  # for file/URI/PIL/cv2/np inputs and NMS
+        device = select_device(
+            '0' if torch.cuda.is_available() else 'cpu'
+        )  # default to GPU if available
         return model.to(device)
 
     except Exception as e:
@@ -65,7 +79,13 @@ def custom(path_or_model='path/to/model.pt', autoshape=True):
     Returns:
         pytorch model
     """
-    model = torch.load(path_or_model, map_location=torch.device('cpu')) if isinstance(path_or_model, str) else path_or_model  # load checkpoint
+    model = (
+        torch.load(
+            path_or_model, map_location=torch.device('cpu'), weights_only=False
+        )
+        if isinstance(path_or_model, str)
+        else path_or_model
+    )  # load checkpoint
     if isinstance(model, dict):
         model = model['ema' if model.get('ema') else 'model']  # load model
 
@@ -73,8 +93,12 @@ def custom(path_or_model='path/to/model.pt', autoshape=True):
     hub_model.load_state_dict(model.float().state_dict())  # load state_dict
     hub_model.names = model.names  # class names
     if autoshape:
-        hub_model = hub_model.autoshape()  # for file/URI/PIL/cv2/np inputs and NMS
-    device = select_device('0' if torch.cuda.is_available() else 'cpu')  # default to GPU if available
+        hub_model = (
+            hub_model.autoshape()
+        )  # for file/URI/PIL/cv2/np inputs and NMS
+    device = select_device(
+        '0' if torch.cuda.is_available() else 'cpu'
+    )  # default to GPU if available
     return hub_model.to(device)
 
 

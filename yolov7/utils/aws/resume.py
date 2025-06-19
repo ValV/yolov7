@@ -2,6 +2,7 @@
 # Usage: $ python utils/aws/resume.py
 
 import os
+
 # import sys
 from pathlib import Path
 
@@ -13,7 +14,7 @@ import yaml
 port = 0  # --master_port
 path = Path('').resolve()
 for last in path.rglob('*/**/last.pt'):
-    ckpt = torch.load(last)
+    ckpt = torch.load(last, weights_only=False)
     if ckpt['optimizer'] is None:
         continue
 
@@ -24,7 +25,9 @@ for last in path.rglob('*/**/last.pt'):
     # Get device count
     d = opt['device'].split(',')  # devices
     nd = len(d)  # number of devices
-    ddp = nd > 1 or (nd == 0 and torch.cuda.device_count() > 1)  # distributed data parallel
+    ddp = nd > 1 or (
+        nd == 0 and torch.cuda.device_count() > 1
+    )  # distributed data parallel
 
     if ddp:  # multi-GPU
         port += 1
