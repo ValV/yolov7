@@ -16,7 +16,7 @@ import torch.optim as optim
 import torch.optim.lr_scheduler as lr_scheduler
 import torch.utils.data
 import yaml
-from torch.cuda import amp
+from torch import amp
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
@@ -560,7 +560,7 @@ def train(hyp, opt, device, tb_writer=None):
                     )
 
             # Forward
-            with amp.autocast(enabled=cuda):
+            with amp.autocast(device_type=('cpu', 'cuda')[cuda], enabled=cuda):
                 pred = model(imgs)  # forward
                 if 'loss_ota' not in hyp or hyp['loss_ota'] == 1:
                     loss, loss_items = compute_loss_ota(

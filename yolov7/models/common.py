@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.ops import DeformConv2d
 from PIL import Image
-from torch.cuda import amp
+from torch import amp
 
 # TODO: remove exception handling after relative import issue fixed
 try:
@@ -38,6 +38,8 @@ except ImportError:
 
 
 ##### basic ####
+
+DEVICE = ('cpu', 'cuda')
 
 
 def autopad(k, p=None):  # kernel, padding
@@ -1135,8 +1137,9 @@ class autoShape(nn.Module):
 
         t = [time_synchronized()]
         p = next(self.model.parameters())  # for device and type
+        cuda = p.device.type != 'cpu'
         if isinstance(imgs, torch.Tensor):  # torch
-            with amp.autocast(enabled=p.device.type != 'cpu'):
+            with amp.autocast(device_type=DEVICE[cuda], enabled=cuda):
                 return self.model(
                     imgs.to(p.device).type_as(p), augment, profile
                 )  # inference
@@ -1192,7 +1195,7 @@ class autoShape(nn.Module):
         )  # uint8 to fp16/32
         t.append(time_synchronized())
 
-        with amp.autocast(enabled=p.device.type != 'cpu'):
+        with amp.autocast(device_type=DEVICE[cuda], enabled=cuda):
             # Inference
             y = self.model(x, augment, profile)[0]  # forward
             t.append(time_synchronized())
