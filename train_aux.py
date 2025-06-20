@@ -449,7 +449,7 @@ def train(hyp, opt, device, tb_writer=None):
         0,
     )  # P, R, mAP@.5, mAP@.5-.95, val_loss(box, obj, cls)
     scheduler.last_epoch = start_epoch - 1  # do not move
-    scaler = amp.GradScaler(device_type=DEVICE[cuda], enabled=cuda)
+    scaler = amp.GradScaler(device=DEVICE[cuda], enabled=cuda)
     compute_loss_ota = ComputeLossAuxOTA(model)  # init loss class
     compute_loss = ComputeLoss(model)  # init loss class
     logger.info(
